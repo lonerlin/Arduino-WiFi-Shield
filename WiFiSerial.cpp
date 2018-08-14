@@ -3,20 +3,30 @@
 
 WiFiSerial::WiFiSerial()
 {
-	Serial.begin(9600);
+	baud = 9600;
 }
-WiFiSerial::WiFiSerial(int Baud)
+WiFiSerial::WiFiSerial(long Baud)
 {
-	Serial.begin(Baud);
+	baud = Baud;
 }
-
+void WiFiSerial::Begin()
+{
+	Serial.begin(baud);
+}
 void WiFiSerial::SerialEvent()
 {
-	messageIni();
+	if (isMessage)
+	{
+		messageIni();
+		isMessage = false;
+	}
+	
 	while (Serial.available())
 	{
-		GetMessage(mySerial.read());
+		analyseMessage(Serial.read());
+		
 	}
+
 	executeOrder();
 }
 String WiFiSerial::GetMessage()
@@ -24,35 +34,48 @@ String WiFiSerial::GetMessage()
 	return "H," + order + "," + paraOne + "," + paraTwo + ",";
 }
 //初始化消息
-void WiFISerial::messageIni()
+void WiFiSerial::messageIni()
 {
+	Serial.println("Ini");
 	order = "";
 	paraOne = 0;
 	paraTwo = 0;
 	tab = 0;
 }
 //生成消息
-void WiFISerial::analyseMessage(char ch)
+void WiFiSerial::analyseMessage(char ch)
 {
+	Serial.println(ch);
 	if (ch == ','){
+		Serial.println("douhao");
 		tab++;
 	}
 	else{
+		Serial.println(tab);
 		switch (tab){
 		case 1:
 			order += ch;
+			Serial.print("order:");
+			Serial.println(order);
+			break;
 		case 2:
 			paraOne = buildNumber(paraOne, ch);
-			mySerial.println(paraOne);
+			//mySerial.println(paraOne);
+			break;
 		case 3:
 			paraTwo = buildNumber(paraTwo, ch);
+			break;
+		case 4:
+			isMessage = true;
+			Serial.println("isMessage=True");
+			break;
 		default:
 			break;
 		}
 	}
 }
 //由字符构建整数
-int WiFISerial::buildNumber(int num, char ch)
+int WiFiSerial::buildNumber(int num, char ch)
 {
 	if (ch >= '0' && ch <= '9')
 	{
@@ -61,36 +84,41 @@ int WiFISerial::buildNumber(int num, char ch)
 	return num;
 }
 
-void WiFiSerial::sendMessage(String Order, int ParaOne, int ParaTow)
+void WiFiSerial::sendMessage(String Order, int ParaOne, int ParaTwo)
 {
 	String msg = "H," + Order + "," + ParaOne + "," + ParaTwo + ",";
 	Serial.println(msg);
-	Serial.flash();
+	Serial.flush();
 }
 
 void WiFiSerial::executeOrder()
 {
-	if ((strcmp(order, "") != 0) && paraOne>=0 )
+	
+	
+	if (tab==4 && (!order.equals("")) && paraOne >= 0)
 	{
-		if (strcmp(order, "dr") == 0)
+		
+		if (order.equals("dr"))
 		{
 			pinMode(paraOne, INPUT);
 			sendMessage(order, paraOne, digitalRead(paraOne));
+			isMessage = True;
 			return;
 		}
-		if (strcmp(order, "ar") == 0)
+		if (order.equals("ar"))
 		{
 			//pinModer(paraOne, INPUT);
 			sendMessage(order, paraOne, analogRead(paraOne));
+			isMessage = True;
 			return;
 		}
-		if (strcmp(order, "dw") == 0 && paraTwo >= 0)
+		if (order.equals("dw") && paraTwo >= 0)
 		{
 			pinMode(paraOne, OUTPUT);
 			digitalWrite(paraOne,paraTwo);
 			return;
 		}
-		if (strcmp(order, "aw") == 0 && paraTwo >= 0)
+		if (order.equals("aw")  && paraTwo >= 0)
 		{
 			analogWrite(paraOne, paraTwo);
 			return;

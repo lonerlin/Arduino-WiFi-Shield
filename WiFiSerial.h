@@ -3,16 +3,19 @@
 
 #include "Arduino.h"
 
-Class WiFiSerial
+class WiFiSerial
 {
 public:
 	String msg;
 	WiFiSerial();
-	WiFiSerial(int Baud);
+	WiFiSerial(long Baud);
 	void SerialEvent();
 	String GetMessage();
+	void Begin();
 private:
 
+	bool isMessage=true;
+	long baud;
 	String order;
 	int paraOne;
 	int paraTwo;
@@ -22,7 +25,7 @@ private:
 	void analyseMessage(char ch);
 	int buildNumber(int num, char ch);
 	void executeOrder();
-	void sendMessage(String Order, int para);
-}
+	void sendMessage(String Order, int ParaOne,int ParaTwo);
+};
 
 #endif // WIFISERIAL_H_INCLUDED
