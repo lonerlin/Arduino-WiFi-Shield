@@ -15,16 +15,17 @@ void WiFiSerial::Begin()
 }
 void WiFiSerial::SerialEvent()
 {
-	if (isMessage)
-	{
-		messageIni();
-		isMessage = false;
-	}
-	
+
+    if (isMessage)
+    {
+        messageIni();
+        isMessage = false;
+    }
 	while (Serial.available())
 	{
+
 		analyseMessage(Serial.read());
-		
+
 	}
 
 	executeOrder();
@@ -36,7 +37,7 @@ String WiFiSerial::GetMessage()
 //初始化消息
 void WiFiSerial::messageIni()
 {
-	Serial.println("Ini");
+
 	order = "";
 	paraOne = 0;
 	paraTwo = 0;
@@ -45,29 +46,27 @@ void WiFiSerial::messageIni()
 //生成消息
 void WiFiSerial::analyseMessage(char ch)
 {
-	Serial.println(ch);
+
 	if (ch == ','){
-		Serial.println("douhao");
+
 		tab++;
 	}
 	else{
-		Serial.println(tab);
+
 		switch (tab){
 		case 1:
 			order += ch;
-			Serial.print("order:");
-			Serial.println(order);
+
 			break;
 		case 2:
 			paraOne = buildNumber(paraOne, ch);
-			//mySerial.println(paraOne);
 			break;
 		case 3:
 			paraTwo = buildNumber(paraTwo, ch);
 			break;
 		case 4:
 			isMessage = true;
-			Serial.println("isMessage=True");
+
 			break;
 		default:
 			break;
@@ -93,23 +92,21 @@ void WiFiSerial::sendMessage(String Order, int ParaOne, int ParaTwo)
 
 void WiFiSerial::executeOrder()
 {
-	
-	
+
+
 	if (tab==4 && (!order.equals("")) && paraOne >= 0)
 	{
-		
+        isMessage=true;
 		if (order.equals("dr"))
 		{
 			pinMode(paraOne, INPUT);
 			sendMessage(order, paraOne, digitalRead(paraOne));
-			isMessage = True;
 			return;
 		}
 		if (order.equals("ar"))
 		{
 			//pinModer(paraOne, INPUT);
 			sendMessage(order, paraOne, analogRead(paraOne));
-			isMessage = True;
 			return;
 		}
 		if (order.equals("dw") && paraTwo >= 0)
@@ -123,6 +120,7 @@ void WiFiSerial::executeOrder()
 			analogWrite(paraOne, paraTwo);
 			return;
 		}
+
 	}
 	return;
 }
