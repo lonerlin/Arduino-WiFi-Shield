@@ -7,7 +7,9 @@ import tkinter.messagebox
 import Arduino
 import tablib
 
-arduino=Arduino.Arduino("192.168.1.101",5000)
+#IP地址和端口两个参数，需根据WIFI扩展板的实际IP和端口重新设置
+arduino=Arduino.Arduino("192.168.1.200",5000)
+
 id= 0
 records=[]
 
@@ -17,14 +19,14 @@ def timerfun():
     if(vT.get()==1):
         temp=arduino.sendMessage('Temp',0,0)
 
-        record=[id,'Temp',temp[3],now]
+        record=[id,'Temp',int(temp[3]),now]
         print(record)
         records.append(record)
         id +=1
     if(vH.get()==1):
         hum=arduino.sendMessage('Hum',0,0)
 
-        record=[id,'Hum',hum[3],now]
+        record=[id,'Hum',int(hum[3]),now]
         print(record)
         records.append(record)
         id+=1
@@ -50,7 +52,8 @@ def writeButtonClick():
     else:
         tkinter.messagebox.showerror("错误：","没有文件名，或者数据为空！")
 
-tk=Tk();
+tk=Tk()
+tk.title('读取温湿度数据，输出到Excel文件')
 vT = IntVar()
 vH = IntVar()
 tk.geometry('320x240')
