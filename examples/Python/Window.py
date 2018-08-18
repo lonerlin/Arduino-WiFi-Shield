@@ -13,9 +13,16 @@ def dwButtonClick():
     arduino.digitalWrite(dwPin.get(),dwValue.get())
 
 def drButtonClick():
-    print(arduino.digitalRead(drPin.get()))
-    dv=arduino.digitalRead(drPin.get())
-    
+    dv.set(int(arduino.digitalRead(drPin.get())))
+
+def awButtonClick():
+    arduino.analogWrite(awPin.get(),awValue.get())
+
+def arButtonClick():
+    av.set(int(arduino.analogRead(arPin.get())))
+
+def testButtonClick():
+    arduino.sendMessage("Hello",9,1)
 
 Label(tk,text='  针脚').grid(row=0,column=1,sticky=W,pady=3)
 Label(tk,text='  值').grid(row=0,column=2,sticky=W)
@@ -38,9 +45,9 @@ arValue=Spinbox(tk,from_=0, to=1024,state="readonly",textvariable=av, width=6)
 
 Button(tk,text=" 写 入 ",command=dwButtonClick).grid(row=1,column=3,padx=5,pady=3)
 Button(tk,text=" 读 取 ",command=drButtonClick).grid(row=2,column=3,padx=5,pady=3)
-Button(tk,text=" 写 入 ").grid(row=3,column=3,padx=5,pady=3)
-Button(tk,text=" 读 取 ").grid(row=4,column=3,padx=5,pady=3)
-
+Button(tk,text=" 写 入 ",command=awButtonClick).grid(row=3,column=3,padx=5,pady=3)
+Button(tk,text=" 读 取 ",command=arButtonClick).grid(row=4,column=3,padx=5,pady=3)
+Button(tk,text="Test Message",command=testButtonClick).grid(row=5,column=3,padx=5,pady=3)
 dwPin.grid(row=1,column=1,sticky=W,padx=5)
 drPin.grid(row=2,column=1,sticky=W,padx=5)
 awPin.grid(row=3,column=1,sticky=W,padx=5)

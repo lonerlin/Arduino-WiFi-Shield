@@ -11,6 +11,7 @@ WiFiSerial::WiFiSerial(long Baud)
 }
 void WiFiSerial::Begin()
 {
+	eventFun=nullptr;
 	Serial.begin(baud);
 }
 void WiFiSerial::SerialEvent()
@@ -113,14 +114,27 @@ void WiFiSerial::executeOrder()
 		{
 			pinMode(paraOne, OUTPUT);
 			digitalWrite(paraOne,paraTwo);
+			Serial.println();
 			return;
 		}
 		if (order.equals("aw")  && paraTwo >= 0)
 		{
 			analogWrite(paraOne, paraTwo);
+			Serial.println();
 			return;
 		}
 
+		if(eventFun)
+        {
+            eventFun(order,paraOne,paraTwo);
+            Serial.println();
+        }
+
 	}
 	return;
+}
+
+void WiFiSerial::setMessageEvent(void (*msgEvent)(String Order,int ParaOne,int ParaTwo))
+{
+    eventFun=msgEvent;
 }

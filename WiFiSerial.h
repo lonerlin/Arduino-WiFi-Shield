@@ -12,6 +12,8 @@ public:
 	void SerialEvent();
 	String GetMessage();
 	void Begin();
+	void sendMessage(String Order, int ParaOne,int ParaTwo);
+	void setMessageEvent(void (*msgEvent)(String Order,int ParaOne,int ParaTwo));
 private:
 
 	bool isMessage=true;
@@ -25,7 +27,7 @@ private:
 	void analyseMessage(char ch);
 	int buildNumber(int num, char ch);
 	void executeOrder();
-	void sendMessage(String Order, int ParaOne,int ParaTwo);
+	void (*eventFun)(String Order,int ParaOne,int ParaTwo);
 };
 
 #endif // WIFISERIAL_H_INCLUDED
