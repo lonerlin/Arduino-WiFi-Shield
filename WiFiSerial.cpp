@@ -98,26 +98,26 @@ void WiFiSerial::executeOrder()
 	if (tab==4 && (!order.equals("")) && paraOne >= 0)
 	{
         isMessage=true;
-		if (order.equals("&dr"))
+		if (order.equals("$dr"))
 		{
 			pinMode(paraOne, INPUT);
 			sendMessage(order, paraOne, digitalRead(paraOne));
 			return;
 		}
-		if (order.equals("&ar"))
+		if (order.equals("$ar"))
 		{
 			//pinModer(paraOne, INPUT);
 			sendMessage(order, paraOne, analogRead(paraOne));
 			return;
 		}
-		if (order.equals("&dw") && paraTwo >= 0)
+		if (order.equals("$dw") && paraTwo >= 0)
 		{
 			pinMode(paraOne, OUTPUT);
 			digitalWrite(paraOne,paraTwo);
 			Serial.println();
 			return;
 		}
-		if (order.equals("&aw")  && paraTwo >= 0)
+		if (order.equals("$aw")  && paraTwo >= 0)
 		{
 			analogWrite(paraOne, paraTwo);
 			Serial.println();
