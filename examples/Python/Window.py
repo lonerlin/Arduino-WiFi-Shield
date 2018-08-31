@@ -1,7 +1,7 @@
+#!usr/bin/python
+
 from tkinter import *
 from Arduino import *
-
-
 
 tk=Tk()
 tk.title('Arduino WIFI 扩展板 数字、模拟读写')
