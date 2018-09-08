@@ -42,6 +42,7 @@ def okButtonClick():
     timer=threading.Timer(1,timerfun)
     timer.start()
 def writeButtonClick():
+    global timer
     if(timer):
         timer.cancel()
     filename=filedialog.asksaveasfilename(defaultextension='xls',filetypes=[('excel files', '.xls')])

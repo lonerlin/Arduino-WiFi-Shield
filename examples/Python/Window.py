@@ -50,7 +50,7 @@ Button(tk,text=" 写 入 ",command=dwButtonClick).grid(row=1,column=3,padx=5,pad
 Button(tk,text=" 读 取 ",command=drButtonClick).grid(row=2,column=3,padx=5,pady=3)
 Button(tk,text=" 写 入 ",command=awButtonClick).grid(row=3,column=3,padx=5,pady=3)
 Button(tk,text=" 读 取 ",command=arButtonClick).grid(row=4,column=3,padx=5,pady=3)
-Button(tk,text="Test Message",command=testButtonClick).grid(row=5,column=3,padx=5,pady=3)
+
 dwPin.grid(row=1,column=1,sticky=W,padx=5)
 drPin.grid(row=2,column=1,sticky=W,padx=5)
 awPin.grid(row=3,column=1,sticky=W,padx=5)

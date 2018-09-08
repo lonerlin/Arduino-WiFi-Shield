@@ -16,14 +16,12 @@ void MessageEvent(String order,int paraOne,int paraTwo)
     if(order=="Hum")
     {
        int chk = DHT11.read(DHT11PIN);
-      wSerial.sendMessage("Hum",0, DHT11.humidity); 
-    }  
+      wSerial.sendMessage("Hum",0, DHT11.humidity);
+    }
 }
 
 void setup()
 {
-  Serial.begin(9600);
- 
   wSerial.Begin();
   wSerial.setMessageEvent(MessageEvent);
 }
