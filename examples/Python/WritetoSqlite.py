@@ -18,8 +18,8 @@ id= 0
 records=[]
 
 DBPath = 'DB.db'
-conn = sqlite3.connect(DBPath)
-cu= conn.cursor()
+timer=None
+#cu= conn.cursor()
 
 #IP地址和端口两个参数，需根据WIFI扩展板的实际IP和端口重新设置
 arduino=Arduino.Arduino("192.168.1.200",5000)
@@ -42,10 +42,10 @@ def timerfun():
         print(record)
         records.append(record)
         id+=1
-    if(id%20==0):
-        insertData(record)
+    if(id%10==0):
+        insertData(records)
         id=0
-        record.clear()
+        records.clear()
     global timer
     timer = threading.Timer(1, timerfun)
     timer.start()
@@ -58,8 +58,9 @@ def okButtonClick():
 
 def writeButtonClick():
     global timer
-    if(timer):
+    if(not timer is None):
         timer.cancel()
+    '''
     filename=filedialog.asksaveasfilename(defaultextension='xls',filetypes=[('excel files', '.xls')])
     if(filename!="" and len(records)>0):
         headers = ("ID", "传感器", "传感器值", "写入时间")
@@ -69,34 +70,48 @@ def writeButtonClick():
         tkinter.messagebox.showinfo("提示：","数据保存成功！")
     else:
         tkinter.messagebox.showerror("错误：","没有文件名，或者数据为空！")
-
+    '''
 def selectTopClick():
-    updateTreeView(100)
+    updateTreeView(getData(100))
 
 
 def dbIni():
+    conn = sqlite3.connect(DBPath)
+    cu=conn.cursor()
     sql="select count(*) from sqlite_master where type='table' and name='dhtinfo'"
-    result=conn.execute(sql)
+    cu.execute(sql)
+    result=cu.fetchone()[0]
+    print(result)
     if (result==0):
-        create_table_sql = '''CREATE TABLE `devices` (
+        create_table_sql = '''CREATE TABLE `dhtinfo` (
                                   `id`   INTEGER PRIMARY KEY AUTOINCREMENT,
                                   `deviceName` TEXT,
                                   `value` int(4)  ,
-                                   `updateTime` TIMESTAMP ,
+                                   `updateTime` DATETIME 
                                 )'''
         conn.execute(create_table_sql)
+    conn.close()
 
 def insertData(data):
-    insert_Sql=''' insert into dhtinfo values (deviceName,value,updateTime)
-                    (?,?,?)
+    conn = sqlite3.connect(DBPath)
+    cu=conn.cursor()
+    insert_Sql=''' insert into dhtinfo(deviceName, value, updateTime) 
+            values (?,?,?)
             '''
-    conn.executemany(insert_Sql,data)
-
+    cu.executemany(insert_Sql,data)
+    conn.commit()
+    cu.close()
+    conn.close()
 def getData(count):
-    sql='''select top ? from dhtinfo 
-      order by id desc'''
-    return conn.execute(sql,(count))
-
+    conn = sqlite3.connect(DBPath)
+    cu=conn.cursor()
+    sql='''select * from dhtinfo 
+      order by id desc limit 0,?'''
+    cu.execute(sql,[count])
+    data= cu.fetchall()
+    cu.close()
+    conn.close()
+    return data
 def delButton(tree):
     x=tree.get_children()
     for item in x:
@@ -106,7 +121,7 @@ def updateTreeView(data):
     delButton(tree)
     for row in data:
         tree.insert("",row[0],values=row)
-    tree.grid()
+
 
 dbIni()
 tk=Tk()
@@ -136,7 +151,7 @@ tree=ttk.Treeview(f)#表格
 tree["columns"] = ("ID","传感器", "传感器值", "写入时间")
 tree.column("ID",width=50,anchor='center')
 tree.column("传感器", width=60)  # 表示列,不显示
-tree.column("传感器值", width=60)
+tree.column("传感器值", width=80)
 tree.column("写入时间", width=120)
 
 tree.heading("ID", text="ID")  # 显示表头
