@@ -14,20 +14,19 @@ arduino=Arduino.Arduino("192.168.1.200",5000)
 
 id= 0
 records=[]
+timer=None
 
 def timerfun():
     global id
     now=time.asctime( time.localtime(time.time()) )
     if(vT.get()==1):
         temp=arduino.sendMessage('Temp',0,0)
-
         record=[id,'Temp',int(temp[3]),now]
         print(record)
         records.append(record)
         id +=1
     if(vH.get()==1):
         hum=arduino.sendMessage('Hum',0,0)
-
         record=[id,'Hum',int(hum[3]),now]
         print(record)
         records.append(record)
@@ -43,8 +42,9 @@ def okButtonClick():
     timer.start()
 def writeButtonClick():
     global timer
-    if(timer):
+    if(not timer is None):
         timer.cancel()
+    #导出数据到Excel文件
     filename=filedialog.asksaveasfilename(defaultextension='xls',filetypes=[('excel files', '.xls')])
     if(filename!="" and len(records)>0):
         headers = ("ID", "传感器", "传感器值", "写入时间")

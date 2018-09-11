@@ -12,7 +12,11 @@ import os
 import sqlite3
 from  tkinter import ttk  #导入内部包
 
-
+'''
+    本实例演示了每秒从Arduino读取温度和湿度信息，写入Sqlite数据库dhtinfo表
+    同时提供了在Treeview中显示最新数据的功能
+    如果需要导出到Excel表中,请调用writeExcel函数
+'''
 
 id= 0
 records=[]
@@ -28,21 +32,19 @@ arduino=Arduino.Arduino("192.168.1.200",5000)
 def timerfun():
     global id
     now=time.asctime( time.localtime(time.time()) )
-    if(vT.get()==1):
+    if(vT.get()==1):     #是否打钩
         temp=arduino.sendMessage('Temp',0,0)
-
         record=['Temp',int(temp[3]),now]
         print(record)
         records.append(record)
         id +=1
-    if(vH.get()==1):
+    if(vH.get()==1):      #是否打钩
         hum=arduino.sendMessage('Hum',0,0)
-
         record=['Hum',int(hum[3]),now]
         print(record)
         records.append(record)
         id+=1
-    if(id%10==0):
+    if(id%20==0):          #每收集到20条信息写入一次数据库
         insertData(records)
         id=0
         records.clear()
@@ -50,31 +52,33 @@ def timerfun():
     timer = threading.Timer(1, timerfun)
     timer.start()
 
-
 def okButtonClick():
     records.clear()
-    timer=threading.Timer(1,timerfun)
+    timer=threading.Timer(1,timerfun)   #启动时钟
     timer.start()
 
 def writeButtonClick():
     global timer
     if(not timer is None):
         timer.cancel()
-    '''
-    filename=filedialog.asksaveasfilename(defaultextension='xls',filetypes=[('excel files', '.xls')])
-    if(filename!="" and len(records)>0):
+
+'''
+def writetoExcel():
+    filename = filedialog.asksaveasfilename(defaultextension='xls', filetypes=[('excel files', '.xls')])
+    if (filename != "" and len(records) > 0):
         headers = ("ID", "传感器", "传感器值", "写入时间")
         dataset = tablib.Dataset(*getData(500), headers=headers)
         with open(filename, 'wb') as f:
             f.write(dataset.xls)
-        tkinter.messagebox.showinfo("提示：","数据保存成功！")
+        tkinter.messagebox.showinfo("提示：", "数据保存成功！")
     else:
-        tkinter.messagebox.showerror("错误：","没有文件名，或者数据为空！")
-    '''
+        tkinter.messagebox.showerror("错误：", "没有文件名，或者数据为空！")
+ '''
+
 def selectTopClick():
     updateTreeView(getData(100))
 
-
+#创建表
 def dbIni():
     conn = sqlite3.connect(DBPath)
     cu=conn.cursor()
@@ -92,6 +96,7 @@ def dbIni():
         conn.execute(create_table_sql)
     conn.close()
 
+#插入数据
 def insertData(data):
     conn = sqlite3.connect(DBPath)
     cu=conn.cursor()
@@ -102,6 +107,8 @@ def insertData(data):
     conn.commit()
     cu.close()
     conn.close()
+
+#导出数据
 def getData(count):
     conn = sqlite3.connect(DBPath)
     cu=conn.cursor()
@@ -112,6 +119,7 @@ def getData(count):
     cu.close()
     conn.close()
     return data
+
 def delButton(tree):
     x=tree.get_children()
     for item in x:
@@ -125,8 +133,6 @@ def updateTreeView(data):
 
 dbIni()
 tk=Tk()
-
-
 
 #tkinter 组件设置
 tk.title('读取温湿度数据，写入数据库中')
@@ -153,15 +159,17 @@ tree.column("ID",width=50,anchor='center')
 tree.column("传感器", width=60)  # 表示列,不显示
 tree.column("传感器值", width=80)
 tree.column("写入时间", width=120)
-
 tree.heading("ID", text="ID")  # 显示表头
 tree.heading("传感器", text="传感器")
 tree.heading("传感器值", text="传感器值")
 tree.heading("写入时间",text="写入时间")
+
+'''
 tree.insert("",0, values=("1", "2", "3"))  # 插入数据，
 tree.insert("", 1, "", values=("1", "2", "3"))
 tree.insert("", 2, "", values=("1", "2", "3"))
 tree.insert("", 3, "", values=("1", "2", "3"))
+'''
 tree["show"] = "headings"
 tree.pack()
 tk.mainloop()

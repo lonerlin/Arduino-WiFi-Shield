@@ -1,8 +1,11 @@
 from clientsocket import *
 
-#所有消息的格式是：H,order(String),paraOne(int),paraTwo(int),
-
 class Arduino:
+    '''
+    所有消息的格式是：H,order(String),paraOne(int),paraTwo(int),
+    digtialWrite ,digitalRead,analogWrite,analogRead四个函数，实现了对Arduino针脚的透明读写
+    '''
+
     #指定Arduino WiFi扩展板的IP地址和端口
     def __init__(self,ip,port):
         self.ip=ip
